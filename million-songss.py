@@ -3,7 +3,7 @@ import sys, os
 
 range_left= 0
 range_right=110000
-output_F="result.txt"
+output_F="MSD_result.txt"
 
 def NUM_SONGS(file):
     songlist=dict()
@@ -52,7 +52,6 @@ def Index_s(file):
 
 def Saving(r,songs_file,ofile):
     s2i=Index_s(songs_file)
-    print "Saving ..."
     f=open(ofile,"w")
     for r_songs in r:
         indices=map(lambda s: s2i[s],r_songs)
@@ -176,44 +175,6 @@ class Liked_songs(Reco):
     def songs_sorting(d):
         return sorted(d.keys(),key=lambda s:d[s],reverse=True)
 
-    def Valid(self, T, users_te, calibrate, u2s_h, n_batch=10):
-        aveEAP=0.0
-        for t in range(T):
-            rusers = users_te[t*n_batch:(t+1)*n_batch]
-            rec=[]
-            start=time.clock()
-            for i,ru in enumerate(rusers):
-                if ru in calibrate:
-                    print "%d] user give scores %s with %d songs"%(i,ru,len(calibrate[ru]))
-                else:
-                    print "%d] scoring user %s do not grab any songs"%(i,ru)
-                fl()
-                sorting=[]
-                for p in self.predictors:
-                    i_songs=[]
-                    if ru in calibrate:
-                        i_songs=songs_sorting(p.Score(calibrate[ru],self.total_s))
-                    else:
-                        i_songs=list(self.total_s)
-                   
-                    cleaned_songs = []
-                    for x in i_songs:
-                        if len(cleaned_songs)>=self.tau: 
-                            break
-                        if ru not in calibrate or x not in calibrate[ru]:
-                             cleaned_songs.append(x)
-                                            
-                    sorting+= [cleaned_songs]
-                    
-                rec += [self.Random_recom(sorting, self.Gamma)]
-
-            cti=time.clock()-start
-            fl()
-            map_cur = mAP(rusers,rec,u2s_h,self.tau)
-            aveEAP+=map_cur
-            fl()
-    
-        print "Done!"
 
     def BasicReco(self, user, calibrate):
         sorting=[]
@@ -239,22 +200,15 @@ class Liked_songs(Reco):
         sti=time.clock()
         Liked_songs=[]
         for i,u in enumerate(l_users):
-            if not (i+1)%10:
-                if u in calibrate:
-                    print "%d] %s w/ %d songs"%(i+1,l_users[i],len(calibrate[u])),
-                else:
-                    print "%d] %s w/ 0 songs"%(i+1,l_users[i]),
-                fl()
             Liked_songs.append(self.BasicReco(u,calibrate))
             cti=time.clock()-sti
-            if not (i+1)%10:
-                print " tot secs: %f (%f)"%(cti,cti/(i+1))
         fl()
         return Liked_songs
 
 
 
 print "range_left: %d , range_right: %d"%(range_left,range_right)
+print "System Processing....."
 sys.stdout.flush()
 
 train_file="train_triplets.txt"
@@ -282,7 +236,7 @@ del u2i
 calibrate=MAP_USER_SONG(evaluate_file)
 
 
-EA = 0.3
+EA = 0.5
 EQ = 5
 
 pr=Introduce_implement(intro_songs_users, EA, EQ)
