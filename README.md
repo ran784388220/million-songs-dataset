@@ -10,6 +10,11 @@ map_evaluation.py
 
 This is an evaluation file. We use mAP(mean average precision) as the evaluation metric.
 
+Before running the code, you need to download the dataset from
+
+http://labrosa.ee.columbia.edu/millionsong/tasteprofile
+"getting the code"
+
 How to run the code
 
 python million-songss.py
